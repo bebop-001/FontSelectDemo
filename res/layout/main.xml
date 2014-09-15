@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:id="@+id/font_demo_wrapper"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:background="@android:color/darker_gray"
+	android:orientation="vertical"
+	tools:context=".MainActivity" >
+
+	<RelativeLayout
+		android:id="@+id/RelativeLayout1"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:background="@android:color/background_dark"
+		android:orientation="vertical"
+		android:padding="5dp" >
+
+		<TextView
+			android:id="@+id/selected_font_header"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="false"
+			android:layout_alignParentRight="false"
+			android:layout_alignParentTop="true"
+			android:layout_centerHorizontal="true"
+			android:background="@android:color/background_dark"
+			android:text="Sample Font"
+			android:textColor="@android:color/white" />
+
+		<TextView
+			android:id="@+id/selected_font_sample"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentRight="true"
+			android:layout_below="@+id/selected_font_header"
+			android:background="@android:color/background_dark"
+			android:minHeight="90dp"
+			android:text="@string/font_sample_text"
+            android:textColor="@android:color/white"
+			android:textSize="15sp" />
+
+		<SeekBar
+			android:id="@+id/font_sample_size"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_below="@+id/selected_font_sample"
+			android:background="@android:color/background_dark" />
+
+		<LinearLayout
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentRight="true"
+			android:layout_below="@+id/scroll_height"
+			android:background="@android:color/background_dark" >
+
+			<TextView
+				android:id="@+id/textView3"
+                android:textColor="@android:color/white"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_gravity="center_horizontal"
+				android:layout_weight="1"
+				android:text="10" />
+
+			<TextView
+				android:id="@+id/textView1"
+                android:textColor="@android:color/white"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="20" />
+
+			<TextView
+				android:id="@+id/textView2"
+                android:textColor="@android:color/white"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="30" />
+
+			<TextView
+				android:id="@+id/textView4"
+                android:textColor="@android:color/white"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="40" />
+
+			<TextView
+				android:id="@+id/textView5"
+                android:textColor="@android:color/white"
+				android:layout_width="0dp"
+				android:layout_height="wrap_content"
+				android:layout_weight="1"
+				android:text="50" />
+		</LinearLayout>
+
+	</RelativeLayout>
+
+	<FrameLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:padding="5dp" >
+
+		<ListView
+			android:id="@+id/font_sample_list"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@android:color/background_dark" >
+
+		</ListView>
+
+	</FrameLayout>
+
+</LinearLayout>
