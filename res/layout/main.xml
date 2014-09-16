@@ -51,9 +51,9 @@
 		<LinearLayout
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
+			android:layout_below="@+id/font_sample_size"
 			android:layout_alignParentLeft="true"
 			android:layout_alignParentRight="true"
-			android:layout_below="@+id/scroll_height"
 			android:background="@android:color/background_dark" >
 
 			<TextView
