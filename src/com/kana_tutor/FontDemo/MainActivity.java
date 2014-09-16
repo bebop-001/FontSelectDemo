@@ -6,6 +6,8 @@ import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -113,6 +115,17 @@ public class MainActivity extends Activity {
         }
         (new asset_fonts()).get("fonts");
     }
+    private void setSelectedFont(String fontName, String fontPath) {
+        TextView tv = (TextView)findViewById(R.id.selected_font_name);
+        tv.setText(fontName);
+        SharedPreferences userPrefs = getSharedPreferences(
+            "user_prefs.txt", Context.MODE_PRIVATE);
+        Editor ed = userPrefs.edit();
+        ed.putString("fontName", fontName);
+        ed.putString("fontPath", fontPath);
+        ed.commit();
+
+    }
     // font select click callback.
     public void fontSelect(View view) {
         ViewHolder vh = (ViewHolder)view.getTag();
@@ -126,27 +139,32 @@ public class MainActivity extends Activity {
                 el.selected = false;
             }
         }
-        vh.fontElement.selected = isChecked;
+        // read selected from the checkbox.  I've seen instaces
+        // where the selected value and the check disagree.  The
+        // user sees the checkbox so use that.
+        if (vh.cb.isChecked()) {
+            vh.fontElement.selected = true;
+            setSelectedFont(vh.fontElement.fontName, vh.fontElement.fontPath);
+        }
+        else {
+            vh.fontElement.selected = false;
+            setSelectedFont(getString(R.string.default_font), vh.fontElement.fontPath);
+        }
         fontSelectListAdapter.notifyDataSetChanged();
     }
-    private OnSeekBarChangeListener sbChangedListener = new OnSeekBarChangeListener() {
-        int progressChanged = 0;
-
-        @Override
-        public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-            progressChanged = progress;
-            Log.i(logTag, "sbChangedListener: change: " + progress);
-        }
-        @Override
-        public void onStartTrackingTouch(SeekBar sb) {
-            Log.i(logTag, "sbChangedListener: start tracking");
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar sb) {
-            Log.i(logTag, "sbChangedListener: stop tracking: " + progressChanged);
-        }
-    };
+    static int selectedFontSize = 10;
+    private OnSeekBarChangeListener sbChangedListener(final int min, final int max) {
+        return new OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
+                selectedFontSize = (int)(min + (((max - min) * progress) / 100d));
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar sb)    {}
+            @Override
+            public void onStopTrackingTouch(SeekBar sb)     {}
+        };
+    }
 
 
 	@Override
@@ -165,8 +183,21 @@ public class MainActivity extends Activity {
 		}
         fontSelectListAdapter = new FontListAdapter(this, fontSampleList);
         fontSampleSizeSeekBar = (SeekBar)findViewById(R.id.font_sample_size);
-        fontSampleSizeSeekBar.setOnSeekBarChangeListener(sbChangedListener);
+        fontSampleSizeSeekBar.setOnSeekBarChangeListener(sbChangedListener(10, 60));
         ListView lv = (ListView)findViewById(R.id.font_sample_list);
         lv.setAdapter(fontSelectListAdapter);
+        SharedPreferences userPrefs = getSharedPreferences(
+            "user_prefs.txt", Context.MODE_PRIVATE);
+        String fontName = userPrefs.getString("fontName", getString(R.string.default_font));
+        setSelectedFont(userPrefs.getString("fontName", getString(R.string.default_font)),
+            userPrefs.getString("fontPath", ""));
+        for(ListElement le : fontSampleList) {
+            if (le.fontName.equals(fontName)) {
+                le.selected = true;
+                fontSelectListAdapter.notifyDataSetChanged();
+                break;
+            }
+        }
+
 	}
 }

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">AndroidCustomFont</string>
+    <string name="app_name">Font Demo:</string>
     <string name="menu_settings">Settings</string>
+    <string name="default_font">Default Font</string>
     <string name="hello_world">Hello world!</string>
 	<string name="font_sample_text">The quick brown fox jumps over the lazy dog.\n
 		すばしっこい茶色の狐はのろまな犬を飛び越える
