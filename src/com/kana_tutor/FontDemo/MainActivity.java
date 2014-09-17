@@ -130,6 +130,13 @@ public class MainActivity extends Activity {
         }
         fontSelectListAdapter.notifyDataSetChanged();
     }
+    private void setSelectedFontSize(int fontSize) {
+        TextView size = (TextView)findViewById(R.id.selected_font_size);
+        size.setText("" + fontSize + " sp");
+        TextView sample = (TextView)findViewById(R.id.selected_font_sample);
+        sample.setTextSize(fontSize);
+        // size.invalidate(); sample.invalidate();
+    }
     // font select click callback.
     public void fontSelect(View view) {
         ViewHolder vh = (ViewHolder)view.getTag();
@@ -155,14 +162,13 @@ public class MainActivity extends Activity {
             setSelectedFont(getString(R.string.default_font), vh.fontElement.fontPath);
         }
     }
-    static int selectedFontSize = 10;
     private OnSeekBarChangeListener sbChangedListener(final int min, final int max) {
         return new OnSeekBarChangeListener() {
+            int selectedFontSize;
             @Override
             public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 selectedFontSize = (int)(min + (((max - min) * progress) / 100d));
-                ((TextView)findViewById(R.id.selected_font_size))
-                    .setText("" + selectedFontSize + " sp");
+                setSelectedFontSize(selectedFontSize);
             }
             @Override
             public void onStartTrackingTouch(SeekBar sb)    {}
@@ -203,16 +209,11 @@ public class MainActivity extends Activity {
             "user_prefs.txt", Context.MODE_PRIVATE);
         setSelectedFont(userPrefs.getString("fontName", getString(R.string.default_font)),
             userPrefs.getString("fontPath", ""));
-        selectedFontSize = minFont; // initial font size.
-        int fs = userPrefs.getInt("fontSize", -1);
-        if (fs > 0) {
-            // selectedFontSize = (int)(min + (((max - min) * progress) / 100d));
-            int unscaled = (int)((fs - minFont) * (100d / (maxFont-minFont)));
-            fontSampleSizeSeekBar.setProgress(unscaled);
-            selectedFontSize = fs;
-        }
-        ((TextView)findViewById(R.id.selected_font_size))
-            .setText("" + selectedFontSize + " sp");
+        // default font size to minimum font size.
+        int fs = userPrefs.getInt("fontSize", minFont);
+        int unscaled = (int)((fs - minFont) * (100d / (maxFont-minFont)));
+        fontSampleSizeSeekBar.setProgress(unscaled);
+        setSelectedFontSize(fs);
         findViewById(R.id.font_info_wrapper).invalidate();
 	}
 }
