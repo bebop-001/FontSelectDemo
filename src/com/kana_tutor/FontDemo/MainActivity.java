@@ -128,6 +128,7 @@ public class MainActivity extends Activity {
         SharedPreferences userPrefs = getSharedPreferences(
             "user_prefs.txt", Context.MODE_PRIVATE);
         Editor ed = userPrefs.edit();
+        tv.setTag(fontPath);
         ed.putString("fontName", fontName);
         ed.putString("fontPath", fontPath);
         ed.commit();
@@ -146,6 +147,7 @@ public class MainActivity extends Activity {
     private void setSelectedFontSize(int fontSize) {
         TextView size = (TextView)findViewById(R.id.selected_font_size);
         size.setText("" + fontSize + " sp");
+        size.setTag(fontSize);
         TextView sample = (TextView)findViewById(R.id.selected_font_sample);
         sample.setTextSize(fontSize);
         // size.invalidate(); sample.invalidate();
@@ -196,6 +198,17 @@ public class MainActivity extends Activity {
         };
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // TODO Auto-generated method stub
+        super.onSaveInstanceState(outState);
+        TextView fontName = (TextView)findViewById(R.id.selected_font_name);
+        outState.putString("fontName", fontName.getText().toString());
+        outState.putString("fontPath", (String)fontName.getTag());
+        TextView fontSize = (TextView)findViewById(R.id.selected_font_size);
+        outState.putInt("fontSize", (Integer)fontSize.getTag());
+    }
+
     final static int minFont = 10; final static int maxFont = 60;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -211,22 +224,24 @@ public class MainActivity extends Activity {
 		        // Log.i(logTag, fontSampleList.get(i).toString());
 		    }
 		}
+		int fontSize = minFont;
+		String fontPath = "";
+		String fontName = getString(R.string.default_font);
+		if (savedInstanceState != null) {
+            fontName = savedInstanceState.getString("fontName");
+            fontPath = savedInstanceState.getString("fontPath");
+            fontSize = savedInstanceState.getInt("fontSize");
+		}
         fontSelectListAdapter = new FontListAdapter(this, fontSampleList);
         fontSampleSizeSeekBar = (SeekBar)findViewById(R.id.font_sample_size);
         fontSampleSizeSeekBar.setOnSeekBarChangeListener(sbChangedListener(10, 60));
         ListView lv = (ListView)findViewById(R.id.font_sample_list);
         lv.setAdapter(fontSelectListAdapter);
-        // update the selected font info from the user prefs and
-        // invalidate the wrapper to force redraw.
-        SharedPreferences userPrefs = getSharedPreferences(
-            "user_prefs.txt", Context.MODE_PRIVATE);
-        setSelectedFont(userPrefs.getString("fontName", getString(R.string.default_font)),
-            userPrefs.getString("fontPath", ""));
+        setSelectedFont(fontName, fontPath);
         // default font size to minimum font size.
-        int fs = userPrefs.getInt("fontSize", minFont);
-        int unscaled = (int)((fs - minFont) * (100d / (maxFont-minFont)));
+        int unscaled = (int)((fontSize - minFont) * (100d / (maxFont-minFont)));
         fontSampleSizeSeekBar.setProgress(unscaled);
-        setSelectedFontSize(fs);
+        setSelectedFontSize(fontSize);
         findViewById(R.id.font_info_wrapper).invalidate();
 	}
 }
