@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,15 +26,19 @@ public class MainActivity extends Activity {
     private static final List<String>   fontNameList = new ArrayList<String>();
     private static FontListAdapter      fontSelectListAdapter;
     private static SeekBar              fontSampleSizeSeekBar;
+    private static Typeface             defaultFont;
     private class ListElement {
         private boolean selected = false; 
-        private String fontPath, fontName; 
+        private String fontPath, fontName;
+        private Typeface fontHandle;
         private ListElement (String fontPath) {
             this.fontPath   = fontPath;
             String fontName = fontPath;
             fontName = fontName.replaceAll("[^/]*/",  "");
             fontName = fontName.replaceAll("\\.[^\\.]*$", "");
             this.fontName = fontName;
+            fontHandle = Typeface.createFromAsset(
+                    MainActivity.this.getAssets(),fontPath);
         }
         public String toString() {
             return String.format(
@@ -81,6 +86,8 @@ public class MainActivity extends Activity {
                 vh.tv = (TextView)rowView.findViewById(R.id.font_name);
                 vh.tv.setText(el.fontName);
                 vh.cb = (CheckBox)rowView.findViewById(R.id.select_this_font);
+                TextView fontSample = (TextView)rowView.findViewById(R.id.font_sample);
+                fontSample.setTypeface(el.fontHandle);
                 vh.position = position;
                 rowView.setTag(vh);
             }
@@ -115,6 +122,8 @@ public class MainActivity extends Activity {
     }
     private void setSelectedFont(String fontName, String fontPath) {
         TextView tv = (TextView)findViewById(R.id.selected_font_name);
+        if (defaultFont == null)
+            defaultFont = tv.getTypeface();
         tv.setText(fontName);
         SharedPreferences userPrefs = getSharedPreferences(
             "user_prefs.txt", Context.MODE_PRIVATE);
@@ -122,12 +131,16 @@ public class MainActivity extends Activity {
         ed.putString("fontName", fontName);
         ed.putString("fontPath", fontPath);
         ed.commit();
+        Typeface newFont = defaultFont;
         for (ListElement el : fontSampleList) {
             if (fontName.equals(el.fontName)) {
                 el.selected = true;
+                newFont = el.fontHandle;
                 break;
             }
         }
+        ((TextView)findViewById(R.id.selected_font_sample))
+            .setTypeface(newFont);
         fontSelectListAdapter.notifyDataSetChanged();
     }
     private void setSelectedFontSize(int fontSize) {
