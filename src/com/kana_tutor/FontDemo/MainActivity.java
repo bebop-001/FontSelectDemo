@@ -20,8 +20,6 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import com.javatechig.droid.ui.R;
-
 public class MainActivity extends Activity {
     private static final String logTag = "MainActivity";
     private static final List<String>   fontNameList = new ArrayList<String>();
@@ -124,7 +122,13 @@ public class MainActivity extends Activity {
         ed.putString("fontName", fontName);
         ed.putString("fontPath", fontPath);
         ed.commit();
-
+        for (ListElement el : fontSampleList) {
+            if (fontName.equals(el.fontName)) {
+                el.selected = true;
+                break;
+            }
+        }
+        fontSelectListAdapter.notifyDataSetChanged();
     }
     // font select click callback.
     public void fontSelect(View view) {
@@ -150,7 +154,6 @@ public class MainActivity extends Activity {
             vh.fontElement.selected = false;
             setSelectedFont(getString(R.string.default_font), vh.fontElement.fontPath);
         }
-        fontSelectListAdapter.notifyDataSetChanged();
     }
     static int selectedFontSize = 10;
     private OnSeekBarChangeListener sbChangedListener(final int min, final int max) {
@@ -158,15 +161,23 @@ public class MainActivity extends Activity {
             @Override
             public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
                 selectedFontSize = (int)(min + (((max - min) * progress) / 100d));
+                ((TextView)findViewById(R.id.selected_font_size))
+                    .setText("" + selectedFontSize + " sp");
             }
             @Override
             public void onStartTrackingTouch(SeekBar sb)    {}
             @Override
-            public void onStopTrackingTouch(SeekBar sb)     {}
+            public void onStopTrackingTouch(SeekBar sb)     {
+                SharedPreferences userPrefs = getSharedPreferences(
+                    "user_prefs.txt", Context.MODE_PRIVATE);
+                Editor ed = userPrefs.edit();
+                ed.putInt("fontSize", selectedFontSize);
+                ed.commit();
+            }
         };
     }
 
-
+    final static int minFont = 10; final static int maxFont = 60;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -186,18 +197,22 @@ public class MainActivity extends Activity {
         fontSampleSizeSeekBar.setOnSeekBarChangeListener(sbChangedListener(10, 60));
         ListView lv = (ListView)findViewById(R.id.font_sample_list);
         lv.setAdapter(fontSelectListAdapter);
+        // update the selected font info from the user prefs and
+        // invalidate the wrapper to force redraw.
         SharedPreferences userPrefs = getSharedPreferences(
             "user_prefs.txt", Context.MODE_PRIVATE);
-        String fontName = userPrefs.getString("fontName", getString(R.string.default_font));
         setSelectedFont(userPrefs.getString("fontName", getString(R.string.default_font)),
             userPrefs.getString("fontPath", ""));
-        for(ListElement le : fontSampleList) {
-            if (le.fontName.equals(fontName)) {
-                le.selected = true;
-                fontSelectListAdapter.notifyDataSetChanged();
-                break;
-            }
+        selectedFontSize = minFont; // initial font size.
+        int fs = userPrefs.getInt("fontSize", -1);
+        if (fs > 0) {
+            // selectedFontSize = (int)(min + (((max - min) * progress) / 100d));
+            int unscaled = (int)((fs - minFont) * (100d / (maxFont-minFont)));
+            fontSampleSizeSeekBar.setProgress(unscaled);
+            selectedFontSize = fs;
         }
-
+        ((TextView)findViewById(R.id.selected_font_size))
+            .setText("" + selectedFontSize + " sp");
+        findViewById(R.id.font_info_wrapper).invalidate();
 	}
 }
