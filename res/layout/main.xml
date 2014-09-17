@@ -1,136 +1,135 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/scroll_wrapper"
+	android:id="@+id/font_demo_wrapper"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:fillViewport="true" >
-		<LinearLayout
-			android:id="@+id/font_demo_wrapper"
+	android:background="@android:color/darker_gray"
+	android:orientation="vertical"
+	tools:context=".MainActivity" >
+
+	<ScrollView
+		android:id="@+id/font_sample_scrollview"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" >
+
+		<RelativeLayout
+			android:id="@+id/RelativeLayout1"
 			android:layout_width="match_parent"
-			android:layout_height="match_parent"
-			android:background="@android:color/darker_gray"
+			android:layout_height="wrap_content"
+			android:background="@android:color/background_dark"
 			android:orientation="vertical"
-			tools:context=".MainActivity" >
+			android:padding="5dp" >
 
-			<RelativeLayout
-				android:id="@+id/RelativeLayout1"
-				android:layout_width="match_parent"
+			<LinearLayout
+				android:id="@+id/font_info_wrapper"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:background="@android:color/background_dark"
-				android:orientation="vertical"
-				android:padding="5dp"
-				android:paddingLeft="20dp"
-				android:paddingRight="20dp" >
-
-				<LinearLayout
-					android:id="@+id/font_info_wrapper"
-					android:layout_width="wrap_content"
-					android:layout_height="wrap_content"
-					android:layout_alignParentTop="true"
-					android:layout_centerHorizontal="true"
-					android:gravity="center_horizontal" >
-
-					<TextView
-						android:id="@+id/selected_font_name"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:background="@android:color/background_dark"
-						android:paddingRight="15dp"
-						android:text="name"
-						android:textColor="@android:color/white" />
-
-					<TextView
-						android:id="@+id/selected_font_size"
-						android:layout_width="wrap_content"
-						android:layout_height="wrap_content"
-						android:background="@android:color/background_dark"
-						android:text="size"
-						android:textColor="@android:color/white" />
-				</LinearLayout>
+				android:layout_alignParentTop="true"
+				android:layout_centerHorizontal="true"
+				android:gravity="center_horizontal" >
 
 				<TextView
-					android:id="@+id/selected_font_sample"
+					android:id="@+id/selected_font_name"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:layout_alignParentRight="true"
-					android:layout_below="@+id/font_info_wrapper"
 					android:background="@android:color/background_dark"
-					android:minHeight="90dp"
-					android:text="@string/font_sample_text"
-					android:textColor="@android:color/white"
-					android:textSize="10sp" />
+					android:paddingRight="15dp"
+					android:text="name"
+					android:textColor="@android:color/white" />
 
-				<SeekBar
-					android:id="@+id/font_sample_size"
-					android:layout_width="match_parent"
-					android:layout_height="wrap_content"
-					android:layout_below="@+id/selected_font_sample"
-					android:background="@android:color/background_dark" />
-
-				<LinearLayout
+				<TextView
+					android:id="@+id/selected_font_size"
 					android:layout_width="wrap_content"
 					android:layout_height="wrap_content"
-					android:layout_alignParentLeft="true"
-					android:layout_alignParentRight="true"
-					android:layout_below="@+id/font_sample_size"
-					android:background="@android:color/background_dark" >
+					android:background="@android:color/background_dark"
+					android:text="size"
+					android:textColor="@android:color/white" />
+			</LinearLayout>
 
-					<TextView
-						android:id="@+id/textView3"
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_gravity="center_horizontal"
-						android:layout_weight="1"
-						android:text="10"
-						android:textColor="@android:color/white" />
+			<TextView
+				android:id="@+id/selected_font_sample"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentRight="true"
+				android:layout_below="@+id/font_info_wrapper"
+				android:background="@android:color/background_dark"
+				android:minHeight="90dp"
+				android:text="@string/font_sample_text"
+				android:textColor="@android:color/white"
+				android:textSize="10sp" />
 
-					<TextView
-						android:id="@+id/textView1"
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:text="20"
-						android:textColor="@android:color/white" />
-
-					<TextView
-						android:id="@+id/textView2"
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:text="30"
-						android:textColor="@android:color/white" />
-
-					<TextView
-						android:id="@+id/textView4"
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:text="40"
-						android:textColor="@android:color/white" />
-
-					<TextView
-						android:id="@+id/textView5"
-						android:layout_width="0dp"
-						android:layout_height="wrap_content"
-						android:layout_weight="1"
-						android:text="50"
-						android:textColor="@android:color/white" />
-				</LinearLayout>
-			</RelativeLayout>
-
-			<FrameLayout
+			<SeekBar
+				android:id="@+id/font_sample_size"
 				android:layout_width="match_parent"
-				android:layout_height="match_parent"
-				android:padding="5dp" >
+				android:layout_height="wrap_content"
+				android:layout_below="@+id/selected_font_sample"
+				android:background="@android:color/background_dark" />
 
-				<ListView
-					android:id="@+id/font_sample_list"
-					android:layout_width="match_parent"
+			<LinearLayout
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:layout_alignParentLeft="true"
+				android:layout_alignParentRight="true"
+				android:layout_below="@+id/font_sample_size"
+				android:background="@android:color/background_dark" >
+
+				<TextView
+					android:id="@+id/textView3"
+					android:layout_width="0dp"
 					android:layout_height="wrap_content"
-					android:background="@android:color/background_dark" >
-				</ListView>
-			</FrameLayout>
-		</LinearLayout>
-</ScrollView>
+					android:layout_gravity="center_horizontal"
+					android:layout_weight="1"
+					android:text="10"
+					android:textColor="@android:color/white" />
+
+				<TextView
+					android:id="@+id/textView1"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="20"
+					android:textColor="@android:color/white" />
+
+				<TextView
+					android:id="@+id/textView2"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="30"
+					android:textColor="@android:color/white" />
+
+				<TextView
+					android:id="@+id/textView4"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="40"
+					android:textColor="@android:color/white" />
+
+				<TextView
+					android:id="@+id/textView5"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="50"
+					android:textColor="@android:color/white" />
+			</LinearLayout>
+		</RelativeLayout>
+	</ScrollView>
+
+	<FrameLayout
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:padding="5dp" >
+
+		<ListView
+			android:id="@+id/font_sample_list"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="@android:color/background_dark" >
+		</ListView>
+	</FrameLayout>
+
+</LinearLayout>
