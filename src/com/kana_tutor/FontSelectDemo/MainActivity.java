@@ -1,4 +1,5 @@
-package com.kana_tutor.FontDemo;
+
+package com.kana_tutor.FontSelectDemo;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,20 +24,26 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity {
     private static final String logTag = "MainActivity";
-    private static final List<String>   fontNameList = new ArrayList<String>();
-    private static FontListAdapter      fontSelectListAdapter;
-    private static SeekBar              fontSampleSizeSeekBar;
-    private static Typeface             defaultFont;
+    private static List<String> fontNameList;
+    private static FontListAdapter fontSelectListAdapter;
+    // default font typeface gets stashed here so we can restore
+    // if user has no fonts selected.
+    private static Typeface defaultFont;
+    // list view elements.
     private class ListElement {
-        private boolean selected = false; 
+        private boolean selected = false;
         private String fontPath, fontName;
         private Typeface fontHandle;
         private ListElement (String fontPath) {
             this.fontPath   = fontPath;
+            // remove path and .ttf from name and call that
+            // the font name since Android doesn's seem to 
+            // read the font name table from the ttf file.
             String fontName = fontPath;
             fontName = fontName.replaceAll("[^/]*/",  "");
             fontName = fontName.replaceAll("\\.[^\\.]*$", "");
             this.fontName = fontName;
+            // read the font file.
             fontHandle = Typeface.createFromAsset(
                     MainActivity.this.getAssets(),fontPath);
         }
@@ -45,6 +52,7 @@ public class MainActivity extends Activity {
                 "listElement name=%s, enabled=%b", fontName, selected);
         }
     }
+    // cache for liet element info in list view.
     static class ViewHolder {
         private ListElement fontElement;
         private TextView    tv;
@@ -67,7 +75,8 @@ public class MainActivity extends Activity {
             this.context = context; this.fontList = fontList;
         }
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(
+                    int position, View convertView, ViewGroup parent) {
             View rowView = convertView;
             ViewHolder vh = null;
             if (rowView != null) {
@@ -75,18 +84,21 @@ public class MainActivity extends Activity {
             }
             if (vh == null || vh.position != position) {
                 vh = new ViewHolder();
-                ListElement el 
+                ListElement el
                     = vh.fontElement
                     = fontList.get(position);
                 LayoutInflater inflater = (LayoutInflater)
                     context.getSystemService(LAYOUT_INFLATER_SERVICE);
                 Log.i(logTag, "getView: position = " + position
                     + ", " + el.toString());
-                rowView = inflater.inflate(R.layout.font_list_item, parent, false);
+                rowView = inflater.inflate(
+                    R.layout.font_list_item, parent, false);
                 vh.tv = (TextView)rowView.findViewById(R.id.font_name);
                 vh.tv.setText(el.fontName);
-                vh.cb = (CheckBox)rowView.findViewById(R.id.select_this_font);
-                TextView fontSample = (TextView)rowView.findViewById(R.id.font_sample);
+                vh.cb = (CheckBox)rowView.findViewById(
+                    R.id.select_this_font);
+                TextView fontSample
+                    = (TextView)rowView.findViewById(R.id.font_sample);
                 fontSample.setTypeface(el.fontHandle);
                 vh.position = position;
                 rowView.setTag(vh);
@@ -97,11 +109,14 @@ public class MainActivity extends Activity {
             return rowView;
         }
     }
-    
+
     // find all the .ttf files under assets/fonts.
-    private void getFontList(){
+    private List<String> getFontList(){
+        List<String> fontList = new ArrayList<String>();
         class asset_fonts {
-            void get(String path) {
+            // recursive script that searchs the assets/path directory
+            // for ttf files.
+            void  get(String path, List<String> fl) {
                 try {
                     String [] asset_files = getResources()
                         .getAssets()
@@ -109,8 +124,8 @@ public class MainActivity extends Activity {
                     for (String f : asset_files) {
                         f = path + "/" + f;
                         // if list gave back files, path is valid.
-                        if (f.endsWith(".ttf")) fontNameList.add(f);
-                        get(f);
+                        if (f.endsWith(".ttf")) fl.add(f);
+                        get(f, fl);
                     }
                 } catch (IOException e) {
                     Log.d(logTag, "__fonts.get():exception:IOException:"
@@ -118,20 +133,16 @@ public class MainActivity extends Activity {
                 }
             }
         }
-        (new asset_fonts()).get("fonts");
+        (new asset_fonts()).get("fonts", fontList);
+        return fontList;
     }
+    // if user's selected font has changed, update the name info in
+    // the sample window and set the font sample to the new font.
     private void setSelectedFont(String fontName, String fontPath) {
         TextView tv = (TextView)findViewById(R.id.selected_font_name);
         if (defaultFont == null)
             defaultFont = tv.getTypeface();
         tv.setText(fontName);
-        SharedPreferences userPrefs = getSharedPreferences(
-            "user_prefs.txt", Context.MODE_PRIVATE);
-        Editor ed = userPrefs.edit();
-        tv.setTag(fontPath);
-        ed.putString("fontName", fontName);
-        ed.putString("fontPath", fontPath);
-        ed.commit();
         Typeface newFont = defaultFont;
         for (ListElement el : fontSampleList) {
             if (fontName.equals(el.fontName)) {
@@ -181,8 +192,12 @@ public class MainActivity extends Activity {
         return new OnSeekBarChangeListener() {
             int selectedFontSize;
             @Override
-            public void onProgressChanged(SeekBar sb, int progress, boolean fromUser) {
-                selectedFontSize = (int)(min + (((max - min) * progress) / 100d));
+            public void onProgressChanged(
+                    SeekBar sb, int progress, boolean fromUser) {
+                // scale from 0-100 range of progress to min-max 
+                // range of font.
+                selectedFontSize 
+                    = (int)(min + (((max - min) * progress) / 100d));
                 setSelectedFontSize(selectedFontSize);
             }
             @Override
@@ -191,13 +206,13 @@ public class MainActivity extends Activity {
             public void onStopTrackingTouch(SeekBar sb)     {
                 SharedPreferences userPrefs = getSharedPreferences(
                     "user_prefs.txt", Context.MODE_PRIVATE);
-                Editor ed = userPrefs.edit();
-                ed.putInt("fontSize", selectedFontSize);
-                ed.commit();
             }
         };
     }
 
+    // OS calls this to save state on orientation, etc before
+    // rebuilding the activity.  We save state and what is saved
+    // here gets passed into onCreate.
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // TODO Auto-generated method stub
@@ -210,38 +225,43 @@ public class MainActivity extends Activity {
     }
 
     final static int minFont = 10; final static int maxFont = 60;
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		// if we haven't inited the font list, do so.
-		if (fontNameList.size() == 0) {
-		    getFontList();
-		    Log.i(logTag, "onCreate:assetListing:"
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.main);
+        SeekBar fontSampleSizeSeekBar;
+        // if we haven't inited the font list, do so.
+        if (fontNameList == null) {
+            fontNameList = getFontList();
+            Log.i(logTag, "onCreate:assetListing:"
                 + fontNameList.toString());
-		    for (int i = 0; i < fontNameList.size(); i++) {
-		        fontSampleList.add(new ListElement(fontNameList.get(i)));
-		        // Log.i(logTag, fontSampleList.get(i).toString());
-		    }
-		}
-		int fontSize = minFont;
-		String fontPath = "";
-		String fontName = getString(R.string.default_font);
-		if (savedInstanceState != null) {
+            for (int i = 0; i < fontNameList.size(); i++) {
+                fontSampleList.add(new ListElement(fontNameList.get(i)));
+                // Log.i(logTag, fontSampleList.get(i).toString());
+            }
+        }
+        int fontSize = minFont;
+        String fontPath = "";
+        String fontName = getString(R.string.default_font);
+        if (savedInstanceState != null) {
             fontName = savedInstanceState.getString("fontName");
             fontPath = savedInstanceState.getString("fontPath");
             fontSize = savedInstanceState.getInt("fontSize");
-		}
+        }
         fontSelectListAdapter = new FontListAdapter(this, fontSampleList);
         fontSampleSizeSeekBar = (SeekBar)findViewById(R.id.font_sample_size);
-        fontSampleSizeSeekBar.setOnSeekBarChangeListener(sbChangedListener(10, 60));
+        fontSampleSizeSeekBar
+            .setOnSeekBarChangeListener(sbChangedListener(10, 60));
         ListView lv = (ListView)findViewById(R.id.font_sample_list);
         lv.setAdapter(fontSelectListAdapter);
         setSelectedFont(fontName, fontPath);
-        // default font size to minimum font size.
-        int unscaled = (int)((fontSize - minFont) * (100d / (maxFont-minFont)));
+        // go from min-max sp font size to 0-100 range for seekbar.
+        int unscaled = (int)((fontSize - minFont)
+            * (100d / (maxFont-minFont)));
         fontSampleSizeSeekBar.setProgress(unscaled);
         setSelectedFontSize(fontSize);
+        // text views sometimes didn't update correctly.  invalidate
+        // their wrapper to force update.
         findViewById(R.id.font_info_wrapper).invalidate();
-	}
+    }
 }
