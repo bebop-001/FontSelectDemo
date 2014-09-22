@@ -5,10 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,8 +42,11 @@ public class MainActivity extends Activity {
             fontName = fontName.replaceAll("[^/]*/",  "");
             fontName = fontName.replaceAll("\\.[^\\.]*$", "");
             this.fontName = fontName;
-            // read the font file.
-            fontHandle = Typeface.createFromAsset(
+            if (fontName.equals(getString(R.string.default_font)))
+                fontHandle = defaultFont;
+            else
+                // read the font file.
+                fontHandle = Typeface.createFromAsset(
                     MainActivity.this.getAssets(),fontPath);
         }
         public String toString() {
@@ -52,7 +54,8 @@ public class MainActivity extends Activity {
                 "listElement name=%s, enabled=%b", fontName, selected);
         }
     }
-    // cache for liet element info in list view.
+    // cache for list element info in list view.
+    @SuppressLint("DefaultLocale")
     static class ViewHolder {
         private ListElement fontElement;
         private TextView    tv;
@@ -114,7 +117,7 @@ public class MainActivity extends Activity {
     private List<String> getFontList(){
         List<String> fontList = new ArrayList<String>();
         class asset_fonts {
-            // recursive script that searchs the assets/path directory
+            // recursive script that search the assets/path directory
             // for ttf files.
             void  get(String path, List<String> fl) {
                 try {
@@ -203,10 +206,7 @@ public class MainActivity extends Activity {
             @Override
             public void onStartTrackingTouch(SeekBar sb)    {}
             @Override
-            public void onStopTrackingTouch(SeekBar sb)     {
-                SharedPreferences userPrefs = getSharedPreferences(
-                    "user_prefs.txt", Context.MODE_PRIVATE);
-            }
+            public void onStopTrackingTouch(SeekBar sb)     {}
         };
     }
 
@@ -215,7 +215,6 @@ public class MainActivity extends Activity {
     // here gets passed into onCreate.
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        // TODO Auto-generated method stub
         super.onSaveInstanceState(outState);
         TextView fontName = (TextView)findViewById(R.id.selected_font_name);
         outState.putString("fontName", fontName.getText().toString());
@@ -235,6 +234,9 @@ public class MainActivity extends Activity {
             fontNameList = getFontList();
             Log.i(logTag, "onCreate:assetListing:"
                 + fontNameList.toString());
+            // first element is the system default.
+            fontSampleList.add(
+                new ListElement(getString(R.string.default_font)));
             for (int i = 0; i < fontNameList.size(); i++) {
                 fontSampleList.add(new ListElement(fontNameList.get(i)));
                 // Log.i(logTag, fontSampleList.get(i).toString());
